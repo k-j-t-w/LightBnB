@@ -18,14 +18,19 @@ const pool = new Pool({
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithEmail = function (email) {
-  let resolvedUser = null;
-  for (const userId in users) {
-    const user = users[userId];
-    if (user && user.email.toLowerCase() === email.toLowerCase()) {
-      resolvedUser = user;
-    }
-  }
-  return Promise.resolve(resolvedUser);
+  return pool
+    .query(`SELECT * FROM users WHERE email = $1`, [email])
+    .then((result) => {
+      if (result.rows.length > 0) {
+        console.log(result.rows[0]);
+        return result.rows[0]; // Return the first user
+      } else {
+        return null; // No user found
+      }
+    })
+    .catch((err) => { 
+      console.log(err.message, "This is the error message when running getUserWithEmail");
+    });
 };
 
 /**
@@ -34,7 +39,19 @@ const getUserWithEmail = function (email) {
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function (id) {
-  return Promise.resolve(users[id]);
+  return pool
+    .query(`SELECT * FROM users WHERE id = $1`, [id])
+    .then((result) => {
+      if (result.rows.length > 0) {
+        console.log(result.rows[0]);
+        return result.rows[0];
+      } else {
+        return null;
+      }
+    })
+    .catch((err) => {
+      console.log(err.message, "This is the error message when calling getUserWithId");
+    });
 };
 
 /**
@@ -43,11 +60,19 @@ const getUserWithId = function (id) {
  * @return {Promise<{}>} A promise to the user.
  */
 const addUser = function (user) {
-  const userId = Object.keys(users).length + 1;
-  user.id = userId;
-  users[userId] = user;
-  return Promise.resolve(user);
+  return pool
+    .query(`INSERT INTO users (name, email, password)
+            VALUES ($1, $2, $3)
+            RETURNING *`, [user.name, user.email, user.password])
+    .then((result) => {
+      return(result);
+    })
+    .catch((err) => {
+      console.log(err.message, "This is the error message when calling addUser")
+    })
 };
+// INSERT INTO users (name, email, password)
+// VALUES ('kai', 'kai@gmail.com', '$2a$10$FB/BOAVhpuLvpOREQVmvmezD4ED/.JBIDRh70tGevYzYzQgFId2u.'),
 
 /// Reservations
 
