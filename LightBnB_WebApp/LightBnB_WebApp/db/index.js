@@ -1,3 +1,4 @@
+// All database interactions run through here
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -7,10 +8,7 @@ const pool = new Pool({
   database: 'lightbnb'
 });
 
-// const query = (text, params, callback) => {
-//   return pool.query(text, params, callback)
-// };
-
+// do 'something' when a query is called
 const query = async(text, params) => {
   const start = Date.now();
   const res = await pool.query(text, params);

@@ -105,7 +105,7 @@ const getAllProperties = function(options, limit = 10) {
   JOIN property_reviews ON properties.id = property_id
   `;
 
-  // add WHERE clauses
+  // add WHERE clauses (switches from WHERE to AND if a previous WHERE clause is present)
   if (options.city) {
     initialClause = true;
     queryParams.push(`%${options.city}%`);
