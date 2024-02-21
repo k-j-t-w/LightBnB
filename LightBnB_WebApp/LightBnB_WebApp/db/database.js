@@ -1,6 +1,3 @@
-const properties = require("./json/properties.json");
-const users = require("./json/users.json");
-
 const db = require('./index.js');
 
 /// Users
@@ -10,7 +7,7 @@ const db = require('./index.js');
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithEmail = function (email) {
+const getUserWithEmail = function(email) {
   return db
     .query(`SELECT * FROM users WHERE email = $1`, [email])
     .then((result) => {
@@ -20,7 +17,7 @@ const getUserWithEmail = function (email) {
         return null; // No user found
       }
     })
-    .catch((err) => { 
+    .catch((err) => {
       console.log(err.message);
     });
 };
@@ -30,7 +27,7 @@ const getUserWithEmail = function (email) {
  * @param {string} id The id of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithId = function (id) {
+const getUserWithId = function(id) {
   return db
     .query(`SELECT * FROM users WHERE id = $1`, [id])
     .then((result) => {
@@ -50,17 +47,17 @@ const getUserWithId = function (id) {
  * @param {{name: string, password: string, email: string}} user
  * @return {Promise<{}>} A promise to the user.
  */
-const addUser = function (user) {
+const addUser = function(user) {
   return db
     .query(`INSERT INTO users (name, email, password)
             VALUES ($1, $2, $3)
             RETURNING *`, [user.name, user.email, user.password])
     .then((result) => {
-      return(result);
+      return (result);
     })
     .catch((err) => {
-      console.log(err.message)
-    })
+      console.log(err.message);
+    });
 };
 
 /// Reservations
@@ -70,7 +67,7 @@ const addUser = function (user) {
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
-const getAllReservations = function (guest_id, limit = 10) {
+const getAllReservations = function(guest_id, limit = 10) {
   return db
     .query(`SELECT reservations.id, properties.*, reservations.start_date, reservations.end_date, reservations.guest_id, AVG(property_reviews.rating) AS average_rating
             FROM properties
@@ -79,14 +76,14 @@ const getAllReservations = function (guest_id, limit = 10) {
             WHERE reservations.guest_id = $1
             GROUP BY properties.id, reservations.id
             ORDER BY start_date
-            LIMIT 10;`, [guest_id])
+            LIMIT $2;`, [guest_id, limit])
     .then((result) => {
       return result.rows;
     })
     .catch((err) => {
-      console.log(err.message)
-    })
-  };
+      console.log(err.message);
+    });
+};
 
 /// Properties
 
@@ -97,7 +94,7 @@ const getAllReservations = function (guest_id, limit = 10) {
  * @return {Promise<[{}]>}  A promise to the properties.
  */
 
-const getAllProperties = function (options, limit = 10) {
+const getAllProperties = function(options, limit = 10) {
   let initialClause = false;
   const queryParams = [];
 
@@ -168,7 +165,7 @@ const getAllProperties = function (options, limit = 10) {
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function (property) {
+const addProperty = function(property) {
   console.log("Adding property:", property);
   return db
     .query(`
@@ -205,11 +202,11 @@ const addProperty = function (property) {
       property.number_of_bedrooms
     ])
     .then((result) => {
-      return(result.rows[0]);
+      return (result.rows[0]);
     })
     .catch((err) => {
-      console.log(err.message)
-    })
+      console.log(err.message);
+    });
 };
 
 module.exports = {
